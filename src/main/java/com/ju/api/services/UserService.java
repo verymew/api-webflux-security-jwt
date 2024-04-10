@@ -3,11 +3,13 @@ package com.ju.api.services;
 import com.ju.api.dtos.UserDto;
 import com.ju.api.models.UserModel;
 import com.ju.api.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
+    @Autowired
     UserRepository userRepository;
     public Mono<UserModel> salvarUsuario(UserDto user){
         try{

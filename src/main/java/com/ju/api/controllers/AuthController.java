@@ -4,10 +4,7 @@ import com.ju.api.dtos.UserDto;
 import com.ju.api.models.UserModel;
 import com.ju.api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -18,5 +15,9 @@ public class AuthController {
     @PostMapping("/salvar")
     public Mono<UserModel> salvarUsuario(@RequestBody UserDto user){
         return userService.salvarUsuario(user);
+    }
+    @GetMapping("/ver")
+    public Mono<String> teste(){
+        return Mono.just("cu");
     }
 }

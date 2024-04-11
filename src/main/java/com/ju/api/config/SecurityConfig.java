@@ -1,4 +1,4 @@
-package com.ju.api.controllers;
+package com.ju.api.config;
 
 
 import org.springframework.context.annotation.Bean;

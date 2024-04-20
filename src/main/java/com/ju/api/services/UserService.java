@@ -25,22 +25,22 @@ public class UserService {
         try{
             UserModel novoUsuario = new UserModel();
             novoUsuario.setEmail(user.getEmail());
-            novoUsuario.setNome(user.getNome());
+            novoUsuario.setUsername(user.getNome());
             novoUsuario.setCpf(user.getCpf());
-            novoUsuario.setSenha(user.getSenha());
+            novoUsuario.setPassword(user.getSenha());
             return userRepository.save(novoUsuario);
         }catch (Exception e){
             throw new RuntimeException("Não foi possível registrar");
         }
     }
-    public Mono<UserModel> procurarUsuario(UserLoginDto user){
-        //procura usuário através do seu e-mail
-        Mono<UserModel> usuario = this.userRepository.findByEmail(user.email);
+    public Mono<UserModel> procurarUsuario(UserLoginDto usuario){
+        //procura usuário através do username
+        Mono<UserModel> user = this.userRepository.findByUsername(usuario.getUsername());
         //Para acessar um Mono<>: usuario.map(user -> user.metodos)
-        String senha = usuario.map(UserModel::getSenha).toString();
+        String senha = user.map(UserModel::getPassword).toString();
         //Verifica a senha e, se estiver correta, retorna o usuario.
-        if(passwordEncoder.matches(user.senha, senha)){
-            return usuario;
+        if(passwordEncoder.matches(usuario.password, senha)){
+            return user;
         }
         return null;
     }

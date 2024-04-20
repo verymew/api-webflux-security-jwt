@@ -3,7 +3,6 @@ package com.ju.api.config;
 import com.ju.api.models.UserModel;
 import com.ju.api.repository.UserRepository;
 import com.ju.api.services.TokenService;
-import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -14,6 +13,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 
@@ -29,11 +29,12 @@ public class JwtFilter implements WebFilter {
         String token = resgatarToken(exchange.getRequest()); //resgata o código via HttpRequest
         //Verifica se existe token e se ele é um token válido
         var login = this.tokenService.validarToken(token);
+        //Se for correto, o filtro vai assinar o token.
         if(login != null){
-            return Mono.fromCallable(() -> this.tokenService.gerarAutenticacao(token))
+            return Mono.fromCallable(() -> this.tokenService.pegarAutorizacao(token))
                     .subscribeOn(Schedulers.boundedElastic())
                     .flatMap(authentication -> chain.filter(exchange)
-                            .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))); //SecurityHolder salva informações de usuários autenticados
+                            .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication)));
         }
         return chain.filter(exchange);
     }

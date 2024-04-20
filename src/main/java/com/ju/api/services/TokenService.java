@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.ju.api.models.UserModel;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,12 +14,12 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
     private final String secret = "nao-prod";
-    public String gerarToken(UserModel user){
+    public String gerarToken(String email){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
                     .withIssuer("login-auth-api")
-                    .withSubject(user.getEmail())
+                    .withSubject(email)
                     .withExpiresAt(this.generateExpirationDate())
                     .sign(algorithm);
             return token;

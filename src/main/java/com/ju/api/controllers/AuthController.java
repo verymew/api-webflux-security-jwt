@@ -36,6 +36,7 @@ public class AuthController {
     public Mono<ResponseEntity> login(@RequestBody Mono<UserLoginDto> usuario){
         return usuario
                 .flatMap(login -> this.authenticationManager
+                        //Método .authenticate está ligado com o ReactiveAuthenticationManager, configurado no securityConfig
                         .authenticate(new UsernamePasswordAuthenticationToken(
                                 login.username, login.password))
                         .map(this.tokenService::gerarToken)) //Retorna um token

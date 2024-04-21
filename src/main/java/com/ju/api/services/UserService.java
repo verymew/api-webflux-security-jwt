@@ -3,6 +3,7 @@ package com.ju.api.services;
 import com.ju.api.dtos.UserDto;
 import com.ju.api.dtos.UserLoginDto;
 import com.ju.api.models.UserModel;
+import com.ju.api.models.UserRole;
 import com.ju.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -23,10 +24,11 @@ public class UserService {
     public Mono<UserModel> salvarUsuario(UserDto user){
         try{
             UserModel novoUsuario = new UserModel();
-            novoUsuario.setEmail(user.getEmail());
-            novoUsuario.setUsername(user.getNome());
-            novoUsuario.setCpf(user.getCpf());
-            novoUsuario.setPassword(user.getSenha());
+            novoUsuario.setUsername(user.username());
+            novoUsuario.setPassword(user.password());
+            novoUsuario.setCpf(user.cpf());
+            novoUsuario.setEmail(user.email());
+            novoUsuario.setUserRole(UserRole.USER);
             return userRepository.save(novoUsuario);
         }catch (Exception e){
             throw new RuntimeException("Não foi possível registrar");

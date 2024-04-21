@@ -50,6 +50,7 @@ public class TokenService {
     public Authentication pegarAutorizacao(String token) {
         //Essa classe investiga o token para resgatar claims/roles
         DecodedJWT jwt = JWT.decode(token);
+        //nome do usuario
         //Resgata claim que contém roles
         Claim roles = jwt.getClaim("roles");
         //transforma as roles em uma coleção de roles com comma separando elas.

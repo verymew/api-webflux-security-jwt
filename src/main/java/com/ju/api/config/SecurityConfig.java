@@ -43,22 +43,19 @@ public class SecurityConfig {
     }
     @Bean
     public ReactiveUserDetailsService userDetailsService(UserRepository users) {
-        return username -> users.findByUsername(username)
-                .map(u -> User
-                        .withUsername(u.getUsername()).password(u.getPassword())
-                        .authorities(u.getRoles().toArray(new String[0]))
-                        .accountExpired(!u.isActive())
-                        .credentialsExpired(!u.isActive())
-                        .disabled(!u.isActive())
-                        .accountLocked(!u.isActive())
-                        .build()
-                );
+        return username -> users.findByUsername(username) //busca um USERMODEL através do repositorio
+                .map(u -> User //transforma em um USERDETAILS < Muito importante para autenticação
+                        .withUsername(u.getUsername())
+                        .password(u.getPassword())
+                        .authorities(u.getAuthorities())
+                        .build());
     }
     @Bean
     public ReactiveAuthenticationManager reactiveAuthenticationManager(ReactiveUserDetailsService userDetailsService,
                                                                        PasswordEncoder passwordEncoder) {
+        //Utiliza o userdetails acima para autenticar as requisições
         var authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-        authenticationManager.setPasswordEncoder(passwordEncoder);
+        authenticationManager.setPasswordEncoder(passwordEncoder); //Utiliza o BCRYPT para fazer a comparação de senha
         return authenticationManager;
     }
 }

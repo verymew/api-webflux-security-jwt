@@ -24,8 +24,6 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
     private ReactiveAuthenticationManager authenticationManager;
-
-
     @PostMapping("/registrar")
     public Mono<UserModel> salvarUsuario(@RequestBody UserDto user){
         return userService.salvarUsuario(user);
@@ -40,8 +38,8 @@ public class AuthController {
                 .flatMap(login -> this.authenticationManager
                         .authenticate(new UsernamePasswordAuthenticationToken(
                                 login.username, login.password))
-                        .map(this.tokenService::gerarToken))
-                .map(jwt -> {
+                        .map(this.tokenService::gerarToken)) //Retorna um token
+                .map(jwt -> { //Token retornado
                     HttpHeaders httpHeaders = new HttpHeaders();
                     httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
                     var tokenBody = Map.of("access_token", jwt);

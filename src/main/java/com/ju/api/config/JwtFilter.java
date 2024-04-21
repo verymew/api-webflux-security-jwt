@@ -1,29 +1,22 @@
 package com.ju.api.config;
 
-import com.ju.api.models.UserModel;
 import com.ju.api.repository.UserRepository;
 import com.ju.api.services.TokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import java.io.IOException;
-
-
+@RequiredArgsConstructor
 public class JwtFilter implements WebFilter {
     public static final String HEADER_PREFIX = "Bearer ";
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private UserRepository userRepository;
+    private final TokenService tokenService;
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String token = resgatarToken(exchange.getRequest()); //resgata o código via HttpRequest

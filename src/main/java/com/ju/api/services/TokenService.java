@@ -35,7 +35,6 @@ public class TokenService {
             throw new RuntimeException("Error while authenticating");
         }
     }
-
     public String validarToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -59,7 +58,6 @@ public class TokenService {
         //Retorna um objeto que indica que o usuario é autenticado
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
-
     private Instant generateExpirationDate(){
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }

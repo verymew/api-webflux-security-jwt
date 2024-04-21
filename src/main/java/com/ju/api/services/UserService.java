@@ -20,7 +20,6 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private  UserRepository userRepository;
-
     public Mono<UserModel> salvarUsuario(UserDto user){
         try{
             UserModel novoUsuario = new UserModel();

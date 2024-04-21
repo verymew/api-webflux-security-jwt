@@ -23,6 +23,7 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
     private ReactiveAuthenticationManager authenticationManager;
     @PostMapping("/registrar")
     public Mono<UserModel> salvarUsuario(@RequestBody UserDto user){
@@ -30,7 +31,7 @@ public class AuthController {
     }
     @GetMapping("/ver")
     public Mono<String> teste(){
-        return Mono.just("cu");
+        return Mono.just("Bem-vinda garota!!");
     }
     @PostMapping("/login")
     public Mono<ResponseEntity> login(@RequestBody Mono<UserLoginDto> usuario){

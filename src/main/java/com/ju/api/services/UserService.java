@@ -18,14 +18,16 @@ import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
+    @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private  UserRepository userRepository;
     public Mono<UserModel> salvarUsuario(UserDto user){
         try{
+            String senhaCodificada = passwordEncoder.encode(user.password());
             UserModel novoUsuario = new UserModel();
             novoUsuario.setUsername(user.username());
-            novoUsuario.setPassword(user.password());
+            novoUsuario.setPassword(senhaCodificada);
             novoUsuario.setCpf(user.cpf());
             novoUsuario.setEmail(user.email());
             novoUsuario.setUserRole(UserRole.USER);

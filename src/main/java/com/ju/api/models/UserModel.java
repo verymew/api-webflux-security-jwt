@@ -31,8 +31,8 @@ public class UserModel implements UserDetails {
     private UserRole userRole;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.userRole == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMNIN"), new SimpleGrantedAuthority("ROLE_USER"));
-        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        if(this.userRole == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER"));
+        else return List.of(new SimpleGrantedAuthority("USER"));
     }
     @Override
     public boolean isAccountNonExpired() {

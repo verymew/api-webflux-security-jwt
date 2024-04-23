@@ -1,5 +1,9 @@
 package com.ju.api.controllers;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.ju.api.dtos.TokenDto;
 import com.ju.api.dtos.UserDto;
 import com.ju.api.dtos.UserLoginDto;
 import com.ju.api.models.UserModel;
@@ -25,6 +29,10 @@ public class AuthController {
     private TokenService tokenService;
     @Autowired
     private ReactiveAuthenticationManager authenticationManager;
+    @GetMapping("/pq")
+    public Mono<String> oi(){
+        return Mono.just("OIIIIIIIIIIIIIII");
+    }
     @PostMapping("/registrar")
     public Mono<UserModel> salvarUsuario(@RequestBody UserDto user){
         return userService.salvarUsuario(user);

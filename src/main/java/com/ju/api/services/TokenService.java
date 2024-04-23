@@ -6,29 +6,49 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.ju.api.config.LoggerC;
 import com.ju.api.models.UserModel;
+import com.ju.api.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 @Service
 public class TokenService {
+    @Autowired
+    private UserRepository userRepository;
     private final String secret = "nao-prod";
     public String gerarToken(Authentication authentication){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            List<String> authoritiesList = authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
             String token = JWT.create()
                     .withIssuer("login-auth-api")
                     .withSubject(authentication.getName()) //Cria uma claim que assina o nome do usuario
                     .withExpiresAt(this.generateExpirationDate())
+                    .withClaim("authorities", authoritiesList)
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception){
@@ -48,17 +68,26 @@ public class TokenService {
         }
     }
     public Authentication pegarAutorizacao(String token) {
-        //Essa classe investiga o token para resgatar claims/roles
+        // Essa classe investiga o token para resgatar claims/roles
         DecodedJWT jwt = JWT.decode(token);
-        //nome do usuario
-        //Resgata claim que contém roles
-        Claim roles = jwt.getClaim("roles");
-        //transforma as roles em uma coleção de roles com comma separando elas.
-        Collection<? extends GrantedAuthority> authorities = roles == null ? AuthorityUtils.NO_AUTHORITIES : AuthorityUtils.commaSeparatedStringToAuthorityList(roles.toString());
-        User principal = new User(jwt.getSubject(), "", authorities); //Esse é um userDetails, para ser instanciado precisa de: username, password e roles.
-        //Retorna um objeto que indica que o usuario é autenticado
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        // Obtém as claims do token
+        Map<String, Claim> claims = jwt.getClaims();
+        // Verifica se a claim "authorities" está presente e não é nula
+        if (claims.containsKey("authorities") && claims.get("authorities") != null) {
+            // Extrai as autoridades do claim "authorities" do token
+            Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("authorities").asArray(String.class))
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+            System.out.println(authorities);
+            // Cria um UserDetails com base nas informações do token
+            UserDetails userDetails = new User(jwt.getSubject(), "", authorities);
+            return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+        } else {
+            // Se a claim "authorities" não estiver presente ou for nula, retorna uma autenticação vazia
+            return null;
+        }
     }
+
     private Instant generateExpirationDate(){
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }

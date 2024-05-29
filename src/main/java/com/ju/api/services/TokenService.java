@@ -6,7 +6,6 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.ju.api.config.LoggerC;
 import com.ju.api.models.UserModel;
 import com.ju.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

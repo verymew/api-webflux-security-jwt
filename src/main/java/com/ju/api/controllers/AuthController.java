@@ -15,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -29,6 +31,11 @@ public class AuthController {
     private TokenService tokenService;
     @Autowired
     private ReactiveAuthenticationManager authenticationManager;
+    @GetMapping("/csrf")
+    public Mono<CsrfToken> csrfToken(ServerWebExchange exchange) {
+        Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
+        return csrfToken != null ? csrfToken : Mono.empty();
+    }
     @GetMapping("/pq")
     public Mono<String> oi(){
         return Mono.just("OIIIIIIIIIIIIIII");

@@ -6,8 +6,11 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.ju.api.config.JwtFilter;
 import com.ju.api.models.UserModel;
 import com.ju.api.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +36,7 @@ import static java.util.stream.Collectors.joining;
 
 @Service
 public class TokenService {
+    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
     @Autowired
     private UserRepository userRepository;
     private final String secret = "nao-prod";
@@ -69,15 +73,16 @@ public class TokenService {
     public Authentication pegarAutorizacao(String token) {
         // Essa classe investiga o token para resgatar claims/roles
         DecodedJWT jwt = JWT.decode(token);
+        logger.info("Token nivel 2 : {}", token);
         // Obtém as claims do token
         Map<String, Claim> claims = jwt.getClaims();
+        logger.info("permissoes: {} ", claims);
         // Verifica se a claim "authorities" está presente e não é nula
         if (claims.containsKey("authorities") && claims.get("authorities") != null) {
             // Extrai as autoridades do claim "authorities" do token
             Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("authorities").asArray(String.class))
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
-            System.out.println(authorities);
             // Cria um UserDetails com base nas informações do token
             UserDetails userDetails = new User(jwt.getSubject(), "", authorities);
             return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());

@@ -33,8 +33,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, TokenService tokenService, ReactiveAuthenticationManager reactiveAuthenticationManager) {
         return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authenticationManager(reactiveAuthenticationManager)
+                .csrf(csrf -> csrf.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()))                .authenticationManager(reactiveAuthenticationManager)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/pq").hasAuthority("USER")
@@ -42,7 +41,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/salvar", "/api/ver").authenticated()
                         .pathMatchers("/api/registrar", "/api/csrf").permitAll()
                         .anyExchange().authenticated()
-                ).addFilterAt(new JwtFilter(tokenService), SecurityWebFiltersOrder.HTTP_BASIC)
+                ).addFilterBefore(new JwtFilter(tokenService), SecurityWebFiltersOrder.HTTP_BASIC)
                 .build();
     }
     @Bean

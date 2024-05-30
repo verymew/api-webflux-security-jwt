@@ -57,11 +57,6 @@ public class JwtFilter implements WebFilter {
                 }
             }
         }
-
-        // String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION); //resgata o headers DO TOKEN JWT, DENTRO DO COOKIE.
-        /*if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(HEADER_PREFIX)) {
-            return bearerToken.substring(7);
-        }*/
         return null;
     }
 }

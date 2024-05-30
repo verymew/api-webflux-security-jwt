@@ -12,10 +12,13 @@ import com.ju.api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -29,6 +32,11 @@ public class AuthController {
     private TokenService tokenService;
     @Autowired
     private ReactiveAuthenticationManager authenticationManager;
+    @GetMapping("/csrf")
+    public Mono<CsrfToken> csrfToken(ServerWebExchange exchange) {
+        Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
+        return csrfToken != null ? csrfToken : Mono.empty();
+    }
     @GetMapping("/pq")
     public Mono<String> oi(){
         return Mono.just("OIIIIIIIIIIIIIII");
@@ -50,10 +58,16 @@ public class AuthController {
                                 login.username, login.password))
                         .map(this.tokenService::gerarToken)) //Retorna um token
                 .map(jwt -> { //Token retornado
+                    //Adiciona headers no token
+                    ResponseCookie cookie = ResponseCookie.from("access_token", jwt)
+                            .httpOnly(true)
+                            .secure(true)
+                            .path("/")
+                            .maxAge(30000)
+                            .build();
                     HttpHeaders httpHeaders = new HttpHeaders();
-                    httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
-                    var tokenBody = Map.of("access_token", jwt);
-                    return new ResponseEntity<>(tokenBody, httpHeaders, HttpStatus.OK);
+                    httpHeaders.add(HttpHeaders.SET_COOKIE, cookie.toString());
+                    return new ResponseEntity<>(httpHeaders, HttpStatus.OK); //retorna um token(jwt) e um httpheaders(cookie)
                 });
     }
 }

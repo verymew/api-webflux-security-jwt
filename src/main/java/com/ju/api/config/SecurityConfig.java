@@ -23,6 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -32,17 +33,15 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, TokenService tokenService, ReactiveAuthenticationManager reactiveAuthenticationManager) {
         return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authenticationManager(reactiveAuthenticationManager)
+                .csrf(csrf -> csrf.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()))                .authenticationManager(reactiveAuthenticationManager)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/pq").hasAuthority("USER")
-                        .pathMatchers("/api/cu").authenticated()
                         .pathMatchers("/api/login").permitAll()
-                        .pathMatchers("/api/salvar", "/api/ver").hasAuthority("ADMIN")
-                        .pathMatchers("/api/registrar").permitAll()
+                        .pathMatchers("/api/salvar", "/api/ver").authenticated()
+                        .pathMatchers("/api/registrar", "/api/csrf").permitAll()
                         .anyExchange().authenticated()
-                ).addFilterAt(new JwtFilter(tokenService), SecurityWebFiltersOrder.HTTP_BASIC)
+                ).addFilterBefore(new JwtFilter(tokenService), SecurityWebFiltersOrder.HTTP_BASIC)
                 .build();
     }
     @Bean

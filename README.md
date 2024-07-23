@@ -19,3 +19,8 @@ Essa é uma API REST :fairy_woman:	 assíncrona :fairy_woman:	 feita com Spring 
 </dependency>
 ```
 - Spring Reactive (webflux): permite a construção de APIs assíncronas. 
+
+## Instalação
+
+```
+mvn install

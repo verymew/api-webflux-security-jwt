@@ -24,3 +24,8 @@ Essa é uma API REST :fairy_woman:	 assíncrona :fairy_woman:	 feita com Spring 
 
 ```
 mvn install
+```
+
+## Diagrama de fluxo do Spring Security
+
+<img src="https://raw.githubusercontent.com/verymew/api-webflux-security-jwt/main/diagrama-security.png">

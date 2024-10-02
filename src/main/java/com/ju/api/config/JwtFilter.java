@@ -24,14 +24,14 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class JwtFilter implements WebFilter {
-    private final TokenService tokenService;
-    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+    @Autowired
+    private TokenService tokenService;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String token = resgatarToken(exchange.getRequest()); //resgata o código via HttpRequest
         //Verifica se existe token e se ele é um token válido
         var login = this.tokenService.validarToken(token);
-        logger.info("Token validado : {}", login);
         //Se for correto, o filtro vai assinar o token.
         if(login != null){
             return Mono.fromCallable(() -> this.tokenService.pegarAutorizacao(token))
@@ -52,7 +52,6 @@ public class JwtFilter implements WebFilter {
                         token = token.substring(0, token.indexOf(';'));
                     }
                     token = token.trim();
-                    logger.info("Token extraído do cookie: {}", token);
                     return token;
                 }
             }

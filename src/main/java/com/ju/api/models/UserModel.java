@@ -34,6 +34,17 @@ public class UserModel implements UserDetails {
         if(this.userRole == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER"));
         else return List.of(new SimpleGrantedAuthority("USER"));
     }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return false;

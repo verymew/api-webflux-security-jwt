@@ -38,7 +38,7 @@ public class UserService {
     }
     public Mono<UserModel> procurarUsuario(UserLoginDto usuario){
         //procura usuário através do username
-        Mono<UserModel> user = this.userRepository.findByUsername(usuario.getUsername());
+        Mono<UserModel> user = this.userRepository.findByUsername(usuario.username);
         //Para acessar um Mono<>: usuario.map(user -> user.metodos)
         String senha = user.map(UserModel::getPassword).toString();
         //Verifica a senha e, se estiver correta, retorna o usuario.
